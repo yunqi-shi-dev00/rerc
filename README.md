@@ -18,7 +18,6 @@ You can download all our processed data by running
 
 The data will be downloaded in `processed_data/{dataset_name}/`. If you're just looking for just dev/test data we used in the paper, it's `processed_data/{dataset_name}/{dev|test}_subsampled.jsonl`.
 
-<details>
 <summary>Follow these steps if you want to generate all processed data from scratch again.</summary>
 
 ```bash
@@ -66,7 +65,6 @@ Note though that because of random sampling to select distractors, some of the r
 
 # Prepare Retriever and LLM Servers
 
-<details>
 <summary> First, install Elasticsearch 7.10. </summary>
 
 ### Install on Mac (option 1)
@@ -105,7 +103,6 @@ pkill -f elasticsearch # to stop the server
 
 Check out the reference sources if you run into problems installing it.
 
-</details>
 
 Start the elasticsearch server on port 9200 (default), and then start the retriever server as shown here. You can change the elasticsearch port in `retriever_server/serve.py` if needed.
 
@@ -130,6 +127,7 @@ MODEL_NAME={model_name} uvicorn serve:app --port 8010 --app-dir llm_server # mod
 If you want to use openai models (e.g., codex in our experiments), you don't need to start it. In that case, you just need to set the environment variable `OPENAI_API_KEY`.
 
 If you start retriever and/or llm_server on a different host or port, update them in `.retriever_address.jsonnet` and `.llm_server_address.jsonnet` before running retrieval/odqa systems.
+
 
 # Run Retrieval and ODQA Systems
 
