@@ -134,10 +134,25 @@ If you start retriever and/or llm_server on a different host or port, update the
 First, download dataset repositories for official evaluation: `./download/official_eval.sh`.
 
 Next, set the variables:
+
 - SYSTEM: choose from (`recot`, `recot_qa`)
 - MODEL: choose from (`codex`, `flan-t5-xxl`, `flan-t5-xl`, `flan-t5-large`, `flan-t5-base`, `none`)
 - DATASET: choose from (`hotpotqa`, `2wikimultihopqa`)
-``bash
+
+The systems ending with `_qa` are for ODQA and others are for retrieval. The `ircot` and `ircot_qa` are proposed systems and others are baselines (see NoR, OneR in paper). For `oner`, choose model to be `none`, not otherwise.
+
+Now you can run the system using (language) model and dataset of your choice by running:
+
+```bash
+./reproduce.sh $SYSTEM $MODEL $DATASET
+```
+
+This script runs several things one after the other: instantiating experiment configs with HPs, running predictions for them on the dev set, picking up the best HP, making experiment config with the best HP, running it on the test set, and summarizing the results with mean and std.
+
+If you prefer to have more control, you can also run it step-by-step as follows:
+
+
+```bash
 # Instantiate experiment configs with different HPs and write them in files.
 python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 1
 python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 2
@@ -176,4 +191,3 @@ python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set aggregate --best
 
 **DISCLAIMER:** Our Codex-based experiments were done when it was free. Now it has been deprecated. You can do these experiments with other OpenAI completion modes, or other open/commercial models (see notes below). But keep track of the cost, as it may add up quickly doing these experiments.
 
-# Download Predictions
