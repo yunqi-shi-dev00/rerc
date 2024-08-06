@@ -131,3 +131,51 @@ If you want to use openai models (e.g., codex in our experiments), you don't nee
 
 If you start retriever and/or llm_server on a different host or port, update them in `.retriever_address.jsonnet` and `.llm_server_address.jsonnet` before running retrieval/odqa systems.
 
+# Run Retrieval and ODQA Systems
+
+First, download dataset repositories for official evaluation: `./download/official_eval.sh`.
+
+Next, set the variables:
+- SYSTEM: choose from (`recot`, `recot_qa`)
+- MODEL: choose from (`codex`, `flan-t5-xxl`, `flan-t5-xl`, `flan-t5-large`, `flan-t5-base`, `none`)
+- DATASET: choose from (`hotpotqa`, `2wikimultihopqa`)
+``bash
+# Instantiate experiment configs with different HPs and write them in files.
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 1
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 2
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 3
+## if you make a change to base_configs, the above steps need to be rerun to
+## regenerate instantiated experiment configs (with HPs populated)
+
+# Run experiments for different HPs on dev set
+python runner.py $SYSTEM $MODEL $DATASET predict --prompt_set 1
+## predict command runs evaluation at the end by default. If you want to run evaluation
+## separately after prediction, you can replace predict with evaluate here.
+
+# Show results for experiments with different HPs
+python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set 1
+## Not necessary as such, it'll just show you the results using different HPs in a nice table.
+
+# Pick the best HP and save the config with that HP.
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 1 --best
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 2 --best
+python runner.py $SYSTEM $MODEL $DATASET write --prompt_set 3 --best
+
+# Run the experiment with best HP on test set
+python runner.py $SYSTEM $MODEL $DATASET predict --prompt_set 1 --best --eval_test --official
+python runner.py $SYSTEM $MODEL $DATASET predict --prompt_set 2 --best --eval_test --official
+python runner.py $SYSTEM $MODEL $DATASET predict --prompt_set 3 --best --eval_test --official
+## predict command runs evaluation at the end by default. If you want to run evaluation
+## separately after prediction, you can replace predict with evaluate here.
+
+# Summarize best test results for individual prompts and aggregate (mean +- std) of them)
+python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set 1 --best --eval_test --official
+python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set 2 --best --eval_test --official
+python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set 3 --best --eval_test --official
+python runner.py $SYSTEM $MODEL $DATASET summarize --prompt_set aggregate --best --eval_test --official
+## The mean and std in the final command is what we reported in the paper.
+```
+
+**DISCLAIMER:** Our Codex-based experiments were done when it was free. Now it has been deprecated. You can do these experiments with other OpenAI completion modes, or other open/commercial models (see notes below). But keep track of the cost, as it may add up quickly doing these experiments.
+
+# Download Predictions
